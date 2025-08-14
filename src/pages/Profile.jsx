@@ -4,6 +4,7 @@ import {
   getCurrentUser,
   logoutUser,
   getAvatarColor,
+  onAuthStateChange,
 } from "../utils/authService";
 import "../styles/Profile.css";
 
@@ -12,12 +13,25 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  useEffect(() => {
-    // Get current user data
+  // Function to update user state
+  const updateUserState = () => {
     const currentUser = getCurrentUser();
     if (currentUser) {
       setUser(currentUser);
+    } else {
+      setUser(null);
     }
+  };
+
+  useEffect(() => {
+    // Get current user data on mount
+    updateUserState();
+
+    // Listen for authentication state changes
+    const unsubscribe = onAuthStateChange(updateUserState);
+
+    // Cleanup listener on unmount
+    return unsubscribe;
   }, []);
 
   const handleLogout = async () => {

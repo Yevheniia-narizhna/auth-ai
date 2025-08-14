@@ -19,6 +19,20 @@ const saveUsers = (users) => {
   localStorage.setItem("users", JSON.stringify(users));
 };
 
+// Custom event for authentication state changes
+const AUTH_EVENT = "authStateChanged";
+
+// Function to dispatch auth state change event
+const dispatchAuthEvent = () => {
+  window.dispatchEvent(new CustomEvent(AUTH_EVENT));
+};
+
+// Function to listen for auth state changes
+export const onAuthStateChange = (callback) => {
+  window.addEventListener(AUTH_EVENT, callback);
+  return () => window.removeEventListener(AUTH_EVENT, callback);
+};
+
 // Register a new user
 export const registerUser = ({ name, email, password }) => {
   try {
@@ -75,6 +89,10 @@ export const registerUser = ({ name, email, password }) => {
     // eslint-disable-next-line no-unused-vars
     const { password: _, ...userWithoutPassword } = newUser;
     localStorage.setItem("currentUser", JSON.stringify(userWithoutPassword));
+
+    // Dispatch auth state change event
+    dispatchAuthEvent();
+
     return {
       success: true,
       user: userWithoutPassword,
@@ -125,6 +143,9 @@ export const loginUser = ({ email, password }) => {
     const { password: _, ...userWithoutPassword } = user;
     localStorage.setItem("currentUser", JSON.stringify(userWithoutPassword));
 
+    // Dispatch auth state change event
+    dispatchAuthEvent();
+
     return {
       success: true,
       user: userWithoutPassword,
@@ -141,6 +162,10 @@ export const loginUser = ({ email, password }) => {
 export const logoutUser = () => {
   try {
     localStorage.removeItem("currentUser");
+
+    // Dispatch auth state change event
+    dispatchAuthEvent();
+
     return {
       success: true,
       message: "Logged out successfully",
