@@ -11,11 +11,15 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [avatarColor, setAvatarColor] = useState(null);
 
   useEffect(() => {
     // Get current user on component mount
     const user = getCurrentUser();
-    setCurrentUser(user);
+    if (user) {
+      setCurrentUser(user);
+      setAvatarColor(getAvatarColor(user.name));
+    }
   }, []);
 
   const handleLogout = async () => {
@@ -57,7 +61,7 @@ const Navbar = () => {
               <div className="user-info">
                 <span
                   className="user-avatar"
-                  style={{ background: getAvatarColor(currentUser.name) }}
+                  style={{ background: avatarColor }}
                 >
                   {currentUser.name.charAt(0).toUpperCase()}
                 </span>
